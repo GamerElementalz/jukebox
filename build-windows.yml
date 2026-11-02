@@ -1,0 +1,30 @@
+name: Build Jukebox (Windows .geode)
+
+# Roda só quando você clicar em "Run workflow" na aba Actions.
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # `sdk: given` lê o campo "geode" do mod.json ("6.0.0-alpha.1")
+      # e baixa exatamente essa versão do SDK.
+      - name: Build
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: given
+          build-config: Release
+
+      - name: Upload .geode
+        uses: actions/upload-artifact@v4
+        with:
+          name: jukebox-windows-geode
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
